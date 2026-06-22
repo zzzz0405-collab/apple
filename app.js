@@ -71,6 +71,7 @@ const historySummary = document.getElementById("historySummary");
 const historyList = document.getElementById("historyList");
 const webFontScale = document.getElementById("webFontScale");
 const webFontScaleText = document.getElementById("webFontScaleText");
+const printArea = document.getElementById("printArea");
 
 if (!Array.isArray(state.records)) state.records = [];
 if (!state.fontScale) state.fontScale = 100;
@@ -211,6 +212,7 @@ function updateSummary() {
   renderDetails();
   renderPreview();
   renderHistory();
+  updatePrintArea();
 }
 
 function renderDetails() {
@@ -244,6 +246,31 @@ function renderPreview() {
     quantity: 1
   };
   drawLabel(previewCanvas, first);
+}
+
+function updatePrintArea() {
+  if (!printArea) return;
+  printArea.innerHTML = "";
+  let items = expandedPrintItems();
+  if (!items.length) {
+    items = [{
+      customer: "測試",
+      location: "地點",
+      product: selectedProduct()?.isBlank ? "" : selectedProduct()?.name || "",
+      quantity: 1
+    }];
+  }
+
+  items.forEach((item, index) => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 1000;
+    canvas.height = 600;
+    drawLabel(canvas, item);
+    const image = document.createElement("img");
+    image.src = canvas.toDataURL("image/png");
+    image.alt = `標籤 ${index + 1}`;
+    printArea.append(image);
+  });
 }
 
 function drawLabel(canvas, item) {
@@ -530,6 +557,8 @@ document.getElementById("shareFirstBtn").addEventListener("click", async () => {
   const ok = await shareCanvas(previewCanvas, "永芳標籤-測試.png");
   if (!ok) alert("此瀏覽器不支援直接分享檔案，請先下載或長按圖片分享。");
 });
+
+window.addEventListener("beforeprint", updatePrintArea);
 
 document.querySelectorAll(".tab-button").forEach(button => {
   button.addEventListener("click", () => {
