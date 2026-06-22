@@ -59,7 +59,15 @@ body {
 main {
   max-width: 980px;
   margin: 0 auto;
-  padding: 12px;
+  padding: 12px 12px calc(82px + env(safe-area-inset-bottom));
+}
+
+.tab-panel {
+  display: none;
+}
+
+.tab-panel.active {
+  display: block;
 }
 
 .card {
@@ -164,7 +172,7 @@ input {
   justify-content: space-between;
   align-items: center;
   min-height: 82px;
-  font-size: 28px;
+  font-size: calc(28px * var(--font-scale, 1));
   font-weight: 900;
   line-height: 1;
   overflow: hidden;
@@ -179,7 +187,7 @@ input {
 .qty {
   padding: 0;
   text-align: center;
-  font-size: 18px;
+  font-size: calc(18px * var(--font-scale, 1));
   font-weight: 900;
 }
 
@@ -188,7 +196,7 @@ input {
   background: #d0342c;
   border: 0;
   border-radius: 8px;
-  font-size: 22px;
+  font-size: calc(22px * var(--font-scale, 1));
   font-weight: 900;
 }
 
@@ -214,7 +222,7 @@ button.ghost {
 
 .actions {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 8px;
   margin-top: 10px;
 }
@@ -277,4 +285,78 @@ canvas {
   margin-top: 6px;
   text-align: center;
   text-decoration: none;
+}
+
+.summary {
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.bottom-tabs {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+  background: color-mix(in srgb, var(--card) 94%, transparent);
+  border-top: 1px solid var(--line);
+  backdrop-filter: blur(14px);
+}
+
+.bottom-tabs button {
+  min-height: 44px;
+  padding: 8px 6px;
+  color: var(--muted);
+  background: transparent;
+  border-radius: 12px;
+  font-size: 13px;
+}
+
+.bottom-tabs button.active {
+  color: white;
+  background: var(--green);
+}
+
+@media print {
+  body {
+    background: white;
+  }
+
+  .topbar,
+  .bottom-tabs,
+  .sticky,
+  .card:not(.print-card),
+  .actions,
+  .hint {
+    display: none !important;
+  }
+
+  main {
+    padding: 0;
+  }
+
+  .tab-panel {
+    display: block;
+  }
+
+  .print-card {
+    display: block !important;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    box-shadow: none;
+  }
+
+  canvas {
+    width: 100mm;
+    max-width: none;
+    border: 0;
+    border-radius: 0;
+  }
 }

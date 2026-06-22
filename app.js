@@ -66,6 +66,14 @@ const totalCount = document.getElementById("totalCount");
 const details = document.getElementById("details");
 const previewCanvas = document.getElementById("previewCanvas");
 const output = document.getElementById("output");
+const historyDateSelect = document.getElementById("historyDateSelect");
+const historySummary = document.getElementById("historySummary");
+const historyList = document.getElementById("historyList");
+const webFontScale = document.getElementById("webFontScale");
+const webFontScaleText = document.getElementById("webFontScaleText");
+
+if (!Array.isArray(state.records)) state.records = [];
+if (!state.fontScale) state.fontScale = 100;
 
 function loadState() {
   const saved = localStorage.getItem(STORAGE_KEY);
@@ -78,12 +86,21 @@ function loadState() {
   }
   return {
     selectedProductId: seedData.appState.selectedProductId,
-    quantities: {}
+    quantities: {},
+    records: [],
+    fontScale: 100
   };
 }
 
 function saveState() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function todayKey(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
 
 function selectedProduct() {
@@ -190,8 +207,10 @@ function escapeHTML(text) {
 
 function updateSummary() {
   totalCount.textContent = `總 ${totalQuantity()} 張`;
+  document.documentElement.style.setProperty("--font-scale", state.fontScale / 100);
   renderDetails();
   renderPreview();
+  renderHistory();
 }
 
 function renderDetails() {
@@ -357,6 +376,8 @@ async function generateAllImages() {
     return;
   }
 
+  recordPrint();
+
   expanded.forEach((item, index) => {
     const canvas = document.createElement("canvas");
     canvas.width = 1000;
@@ -382,7 +403,77 @@ async function generateAllImages() {
   });
 }
 
+function recordPrint() {
+  const now = new Date();
+  const newRecords = printItems().map(item => ({
+    id: `${Date.now()}-${Math.random()}`,
+    timestamp: now.toISOString(),
+    dateKey: todayKey(now),
+    customer: item.customer,
+    location: item.location,
+    product: item.product,
+    quantity: item.quantity
+  }));
+  state.records = [...newRecords, ...(state.records || [])];
+  saveState();
+  renderHistory();
+}
+
+function renderHistoryDateOptions() {
+  const selected = historyDateSelect.value || "today";
+  const dates = [...new Set((state.records || []).map(record => record.dateKey || todayKey(new Date(record.timestamp))))].sort().reverse();
+  historyDateSelect.innerHTML = `
+    <option value="today">今天</option>
+    <option value="all">全部日期</option>
+  `;
+  dates.forEach(key => {
+    if (key === todayKey()) return;
+    const option = document.createElement("option");
+    option.value = key;
+    option.textContent = key;
+    historyDateSelect.append(option);
+  });
+  historyDateSelect.value = [...historyDateSelect.options].some(option => option.value === selected) ? selected : "today";
+}
+
+function renderHistory() {
+  if (!historyDateSelect) return;
+  renderHistoryDateOptions();
+  const filter = historyDateSelect.value || "today";
+  const records = (state.records || []).filter(record => {
+    const key = record.dateKey || todayKey(new Date(record.timestamp));
+    if (filter === "all") return true;
+    if (filter === "today") return key === todayKey();
+    return key === filter;
+  });
+
+  historySummary.textContent = `共 ${records.length} 筆，合計 ${records.reduce((sum, record) => sum + Number(record.quantity || 0), 0)} 張`;
+  historyList.className = records.length ? "details" : "details empty";
+  historyList.innerHTML = "";
+  if (!records.length) {
+    historyList.textContent = "尚無紀錄";
+    return;
+  }
+
+  records.forEach(record => {
+    const time = new Date(record.timestamp).toLocaleString("zh-TW", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" });
+    const line = document.createElement("div");
+    line.className = "detail-line";
+    line.innerHTML = `
+      <strong>${escapeHTML(record.customer)}</strong>
+      <span>${escapeHTML(record.location)}</span>
+      <span>${escapeHTML(record.product || "空白")}</span>
+      <span>${escapeHTML(time)}</span>
+      <strong>${Number(record.quantity || 0)} 張</strong>
+    `;
+    historyList.append(line);
+  });
+}
+
 function render() {
+  document.documentElement.style.setProperty("--font-scale", state.fontScale / 100);
+  webFontScale.value = state.fontScale;
+  webFontScaleText.textContent = `${state.fontScale}%`;
   renderProducts();
   renderCustomers();
   updateSummary();
@@ -402,9 +493,42 @@ document.getElementById("resetBtn").addEventListener("click", () => {
 
 document.getElementById("generateBtn").addEventListener("click", generateAllImages);
 
+document.getElementById("systemPrintBtn").addEventListener("click", () => {
+  if (!printItems().length) {
+    alert("請至少輸入一筆件數。");
+    return;
+  }
+  recordPrint();
+  window.print();
+});
+
 document.getElementById("shareFirstBtn").addEventListener("click", async () => {
   const ok = await shareCanvas(previewCanvas, "永芳標籤-測試.png");
   if (!ok) alert("此瀏覽器不支援直接分享檔案，請先下載或長按圖片分享。");
+});
+
+document.querySelectorAll(".tab-button").forEach(button => {
+  button.addEventListener("click", () => {
+    document.querySelectorAll(".tab-button").forEach(item => item.classList.toggle("active", item === button));
+    document.querySelectorAll(".tab-panel").forEach(panel => panel.classList.toggle("active", panel.id === button.dataset.tab));
+    if (button.dataset.tab === "historyTab") renderHistory();
+  });
+});
+
+historyDateSelect.addEventListener("change", renderHistory);
+
+document.getElementById("clearHistoryBtn").addEventListener("click", () => {
+  if (!confirm("確定要清除全部列印紀錄嗎？")) return;
+  state.records = [];
+  saveState();
+  renderHistory();
+});
+
+webFontScale.addEventListener("input", event => {
+  state.fontScale = Number(event.target.value);
+  saveState();
+  webFontScaleText.textContent = `${state.fontScale}%`;
+  document.documentElement.style.setProperty("--font-scale", state.fontScale / 100);
 });
 
 render();

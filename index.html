@@ -18,35 +18,69 @@
   </header>
 
   <main>
-    <section class="card sticky">
-      <label class="field-label" for="productSelect">品項</label>
-      <div class="toolbar-row">
-        <select id="productSelect"></select>
-        <strong id="totalCount">總 0 張</strong>
-      </div>
+    <section id="printTab" class="tab-panel active">
+      <section class="card sticky">
+        <label class="field-label" for="productSelect">品項</label>
+        <div class="toolbar-row">
+          <select id="productSelect"></select>
+          <strong id="totalCount">總 0 張</strong>
+        </div>
+      </section>
+
+      <section class="card print-card">
+        <h2>客戶件數</h2>
+        <div id="customerColumns" class="columns"></div>
+      </section>
+
+      <section class="card">
+        <h2>列印明細</h2>
+        <div id="details" class="details empty">尚未輸入件數</div>
+      </section>
+
+      <section class="card">
+        <h2>標籤預覽</h2>
+        <canvas id="previewCanvas" width="1000" height="600"></canvas>
+        <div class="actions">
+          <button id="generateBtn">產生全部標籤圖片</button>
+          <button id="shareFirstBtn" class="secondary">分享第一張測試</button>
+          <button id="systemPrintBtn" class="secondary">系統列印</button>
+        </div>
+        <p class="hint">iPhone Safari 可嘗試用「分享」傳到芯燁 App。系統列印會呼叫 Safari 列印，但 XP-420B 通常不是 AirPrint。</p>
+        <div id="output" class="output"></div>
+      </section>
     </section>
 
-    <section class="card">
-      <h2>客戶件數</h2>
-      <div id="customerColumns" class="columns"></div>
+    <section id="historyTab" class="tab-panel">
+      <section class="card">
+        <h2>列印紀錄</h2>
+        <div class="toolbar-row">
+          <select id="historyDateSelect">
+            <option value="today">今天</option>
+            <option value="all">全部日期</option>
+          </select>
+          <button id="clearHistoryBtn" class="ghost">清除</button>
+        </div>
+        <div id="historySummary" class="summary">共 0 筆，合計 0 張</div>
+        <div id="historyList" class="details empty">尚無紀錄</div>
+      </section>
     </section>
 
-    <section class="card">
-      <h2>列印明細</h2>
-      <div id="details" class="details empty">尚未輸入件數</div>
-    </section>
-
-    <section class="card">
-      <h2>標籤預覽</h2>
-      <canvas id="previewCanvas" width="1000" height="600"></canvas>
-      <div class="actions">
-        <button id="generateBtn">產生全部標籤圖片</button>
-        <button id="shareFirstBtn" class="secondary">分享第一張測試</button>
-      </div>
-      <p class="hint">iPhone Safari 可嘗試用「分享」傳到芯燁 App。若分享檔案不可用，請用下方產生的圖片長按儲存或分享。</p>
-      <div id="output" class="output"></div>
+    <section id="settingsTab" class="tab-panel">
+      <section class="card">
+        <h2>設定</h2>
+        <label class="field-label" for="webFontScale">列印頁畫面字體</label>
+        <input id="webFontScale" type="range" min="80" max="160" step="5">
+        <div id="webFontScaleText" class="summary">100%</div>
+        <p class="hint">Web App 版本目前使用瀏覽器本機儲存；清除 Safari 網站資料會清掉件數與紀錄。</p>
+      </section>
     </section>
   </main>
+
+  <nav class="bottom-tabs">
+    <button class="tab-button active" data-tab="printTab">列印標籤</button>
+    <button class="tab-button" data-tab="historyTab">列印紀錄</button>
+    <button class="tab-button" data-tab="settingsTab">設定</button>
+  </nav>
 
   <script src="./app.js"></script>
 </body>
