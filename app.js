@@ -362,14 +362,19 @@ async function shareCanvas(canvas, name) {
   return false;
 }
 
-async function generateAllImages() {
-  output.innerHTML = "";
+function expandedPrintItems() {
   const expanded = [];
   printItems().forEach(item => {
     for (let i = 0; i < item.quantity; i += 1) {
       expanded.push({ ...item, quantity: 1 });
     }
   });
+  return expanded;
+}
+
+async function generateAllImages() {
+  output.innerHTML = "";
+  const expanded = expandedPrintItems();
 
   if (!expanded.length) {
     alert("請至少輸入一筆件數。");
@@ -401,6 +406,32 @@ async function generateAllImages() {
     card.append(shareBtn);
     output.append(card);
   });
+}
+
+async function shareAllLabels() {
+  const expanded = expandedPrintItems();
+  if (!expanded.length) {
+    alert("請至少輸入一筆件數。");
+    return;
+  }
+
+  const files = [];
+  for (let index = 0; index < expanded.length; index += 1) {
+    const canvas = document.createElement("canvas");
+    canvas.width = 1000;
+    canvas.height = 600;
+    drawLabel(canvas, expanded[index]);
+    files.push(await canvasToFile(canvas, `永芳標籤-${index + 1}.png`));
+  }
+
+  if (navigator.canShare && navigator.canShare({ files })) {
+    recordPrint();
+    await navigator.share({ files, title: "永芳標籤" });
+    return;
+  }
+
+  await generateAllImages();
+  alert("此瀏覽器不支援一次分享全部標籤，已產生圖片，請逐張按分享。");
 }
 
 function recordPrint() {
@@ -493,14 +524,7 @@ document.getElementById("resetBtn").addEventListener("click", () => {
 
 document.getElementById("generateBtn").addEventListener("click", generateAllImages);
 
-document.getElementById("systemPrintBtn").addEventListener("click", () => {
-  if (!printItems().length) {
-    alert("請至少輸入一筆件數。");
-    return;
-  }
-  recordPrint();
-  window.print();
-});
+document.getElementById("shareAllBtn").addEventListener("click", shareAllLabels);
 
 document.getElementById("shareFirstBtn").addEventListener("click", async () => {
   const ok = await shareCanvas(previewCanvas, "永芳標籤-測試.png");
