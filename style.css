@@ -134,36 +134,39 @@ input {
 .columns {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 6px;
+  gap: 4px;
 }
 
 .column {
   display: flex;
   flex-direction: column;
-  gap: 5px;
-  padding: 6px;
-  background: color-mix(in srgb, var(--bg) 75%, var(--card));
-  border-radius: 10px;
+  gap: 3px;
+  padding: 4px;
+  background: color-mix(in srgb, var(--bg) 68%, var(--card));
+  border-radius: 6px;
 }
 
 .column-title {
-  padding: 6px;
+  padding: 5px 2px;
   text-align: center;
-  font-size: 12px;
+  font-size: calc(12px * var(--font-scale, 1));
   font-weight: 800;
   color: var(--muted);
+  background: color-mix(in srgb, var(--card) 72%, var(--bg));
+  border-radius: 6px;
 }
 
 .customer-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 44px;
-  gap: 5px;
+  grid-template-columns: minmax(0, 1fr) minmax(36px, 42px);
+  gap: 4px;
   align-items: stretch;
+  height: calc(92px * var(--font-scale, 1));
   min-height: 92px;
-  padding: 6px;
+  padding: 4px;
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 4px;
 }
 
 .customer-name {
@@ -171,32 +174,48 @@ input {
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  min-height: 82px;
+  width: 100%;
+  min-height: 0;
+  padding: 3px 0;
+  color: var(--text);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
   font-size: calc(28px * var(--font-scale, 1));
   font-weight: 900;
   line-height: 1;
   overflow: hidden;
 }
 
+.customer-name span {
+  display: block;
+}
+
 .qty-controls {
   display: grid;
-  grid-template-rows: 42px 1fr;
+  grid-template-rows: minmax(34px, calc(34px * var(--font-scale, 1))) 1fr;
   gap: 5px;
+  align-items: stretch;
 }
 
 .qty {
+  width: 100%;
+  min-height: 0;
   padding: 0;
   text-align: center;
-  font-size: calc(18px * var(--font-scale, 1));
+  font-size: calc(17px * var(--font-scale, 1));
   font-weight: 900;
+  border-radius: 6px;
 }
 
 .minus {
   color: white;
   background: #d0342c;
   border: 0;
-  border-radius: 8px;
-  font-size: calc(22px * var(--font-scale, 1));
+  border-radius: 6px;
+  min-height: 0;
+  padding: 0;
+  font-size: calc(20px * var(--font-scale, 1));
   font-weight: 900;
 }
 
