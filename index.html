@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="永芳標籤">
+  <title>永芳出貨標籤 Web</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <div class="title">永芳出貨標籤 Web</div>
+      <div class="subtitle">先產生圖片，再分享到芯燁 App 測試列印</div>
+    </div>
+    <button id="resetBtn" class="ghost">歸零</button>
+  </header>
+
+  <main>
+    <section class="card sticky">
+      <label class="field-label" for="productSelect">品項</label>
+      <div class="toolbar-row">
+        <select id="productSelect"></select>
+        <strong id="totalCount">總 0 張</strong>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>客戶件數</h2>
+      <div id="customerColumns" class="columns"></div>
+    </section>
+
+    <section class="card">
+      <h2>列印明細</h2>
+      <div id="details" class="details empty">尚未輸入件數</div>
+    </section>
+
+    <section class="card">
+      <h2>標籤預覽</h2>
+      <canvas id="previewCanvas" width="1000" height="600"></canvas>
+      <div class="actions">
+        <button id="generateBtn">產生全部標籤圖片</button>
+        <button id="shareFirstBtn" class="secondary">分享第一張測試</button>
+      </div>
+      <p class="hint">iPhone Safari 可嘗試用「分享」傳到芯燁 App。若分享檔案不可用，請用下方產生的圖片長按儲存或分享。</p>
+      <div id="output" class="output"></div>
+    </section>
+  </main>
+
+  <script src="./app.js"></script>
+</body>
+</html>
