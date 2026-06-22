@@ -478,6 +478,7 @@ function recordPrint() {
 }
 
 function renderHistoryDateOptions() {
+  if (!historyDateSelect) return;
   const selected = historyDateSelect.value || "today";
   const dates = [...new Set((state.records || []).map(record => record.dateKey || todayKey(new Date(record.timestamp))))].sort().reverse();
   historyDateSelect.innerHTML = `
@@ -495,7 +496,7 @@ function renderHistoryDateOptions() {
 }
 
 function renderHistory() {
-  if (!historyDateSelect) return;
+  if (!historyDateSelect || !historySummary || !historyList) return;
   renderHistoryDateOptions();
   const filter = historyDateSelect.value || "today";
   const records = (state.records || []).filter(record => {
@@ -530,8 +531,8 @@ function renderHistory() {
 
 function render() {
   document.documentElement.style.setProperty("--font-scale", state.fontScale / 100);
-  webFontScale.value = state.fontScale;
-  webFontScaleText.textContent = `${state.fontScale}%`;
+  if (webFontScale) webFontScale.value = state.fontScale;
+  if (webFontScaleText) webFontScaleText.textContent = `${state.fontScale}%`;
   renderProducts();
   renderCustomers();
   updateSummary();
@@ -543,15 +544,15 @@ productSelect.addEventListener("change", event => {
   updateSummary();
 });
 
-document.getElementById("resetBtn").addEventListener("click", () => {
+document.getElementById("resetBtn")?.addEventListener("click", () => {
   state.quantities = {};
   saveState();
   render();
 });
 
-document.getElementById("generateBtn").addEventListener("click", generateAllImages);
+document.getElementById("generateBtn")?.addEventListener("click", generateAllImages);
 
-document.getElementById("systemPrintBtn").addEventListener("click", () => {
+document.getElementById("systemPrintBtn")?.addEventListener("click", () => {
   if (!printItems().length) {
     alert("請至少輸入一筆件數。");
     return;
@@ -561,7 +562,12 @@ document.getElementById("systemPrintBtn").addEventListener("click", () => {
   window.print();
 });
 
-document.getElementById("shareAllBtn").addEventListener("click", shareAllLabels);
+document.getElementById("shareAllBtn")?.addEventListener("click", shareAllLabels);
+
+document.getElementById("shareFirstBtn")?.addEventListener("click", async () => {
+  const ok = await shareCanvas(previewCanvas, "永芳標籤-測試.png");
+  if (!ok) alert("此瀏覽器不支援直接分享檔案，請先下載或長按圖片分享。");
+});
 
 window.addEventListener("beforeprint", updatePrintArea);
 
@@ -573,19 +579,19 @@ document.querySelectorAll(".tab-button").forEach(button => {
   });
 });
 
-historyDateSelect.addEventListener("change", renderHistory);
+historyDateSelect?.addEventListener("change", renderHistory);
 
-document.getElementById("clearHistoryBtn").addEventListener("click", () => {
+document.getElementById("clearHistoryBtn")?.addEventListener("click", () => {
   if (!confirm("確定要清除全部列印紀錄嗎？")) return;
   state.records = [];
   saveState();
   renderHistory();
 });
 
-webFontScale.addEventListener("input", event => {
+webFontScale?.addEventListener("input", event => {
   state.fontScale = Number(event.target.value);
   saveState();
-  webFontScaleText.textContent = `${state.fontScale}%`;
+  if (webFontScaleText) webFontScaleText.textContent = `${state.fontScale}%`;
   document.documentElement.style.setProperty("--font-scale", state.fontScale / 100);
 });
 
