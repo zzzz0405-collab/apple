@@ -551,12 +551,17 @@ document.getElementById("resetBtn").addEventListener("click", () => {
 
 document.getElementById("generateBtn").addEventListener("click", generateAllImages);
 
-document.getElementById("shareAllBtn").addEventListener("click", shareAllLabels);
-
-document.getElementById("shareFirstBtn").addEventListener("click", async () => {
-  const ok = await shareCanvas(previewCanvas, "永芳標籤-測試.png");
-  if (!ok) alert("此瀏覽器不支援直接分享檔案，請先下載或長按圖片分享。");
+document.getElementById("systemPrintBtn").addEventListener("click", () => {
+  if (!printItems().length) {
+    alert("請至少輸入一筆件數。");
+    return;
+  }
+  updatePrintArea();
+  recordPrint();
+  window.print();
 });
+
+document.getElementById("shareAllBtn").addEventListener("click", shareAllLabels);
 
 window.addEventListener("beforeprint", updatePrintArea);
 
